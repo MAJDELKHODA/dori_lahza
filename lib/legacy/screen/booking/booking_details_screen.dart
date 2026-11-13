@@ -1,4 +1,4 @@
-import 'package:dori_lahza/screen/booking/reschedule_booking_screen.dart';
+import 'package:dori_lahza/legacy/screen/booking/reschedule_booking_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';

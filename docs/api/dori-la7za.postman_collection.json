@@ -1,0 +1,2072 @@
+{
+    "info": {
+        "_postman_id": "1e6320b3-b87b-5a77-835c-b9d84298b9c3",
+        "name": "دوري — API la7za",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": "مجموعة الطلبات التي يحتاجها تطبيق Flutter لـ **la7za** على منصة دوري.\nالمجموعة جاهزة لمنشأتك: المتغيران `baseUrl` و `placeSlug` معبّآن مسبقًا.\n\nرابط منشأتك في الـ API: https://dori.toldpath.com/api/v1/places/la7za\n\n## ابدأ هنا\n1. شغّل «Ping» ثم «معلومات المنشأة» للتأكد أن كل شيء يعمل.\n2. أنشئ حسابًا من «تسجيل عميل جديد» أو ادخل من «تسجيل الدخول» — يُحفظ التوكن تلقائيًا ويُستخدم في كل الطلبات المحمية 🔒.\n3. جرّب الطلبات بالترتيب: التصفح ← شريط الأيام ← الأوقات المتاحة ← احجز ← تفاصيل الحجز.\n4. ثم الميزات الخاصة: قائمة الانتظار الذكية، الدور الحي، وأفضل وقت للزيارة.\n\n## شكل الرد\nكل رد: `{ success, message, data, meta }` — وعند الخطأ: `{ success: false, message, error: { code, details } }`.\n\n## التوثيق الكامل\n- صفحة «API منشأتي» في لوحة التحكم: https://dori.toldpath.com/owner/api\n- التوثيق التفاعلي لكل المنصة: https://dori.toldpath.com/docs"
+    },
+    "item": [
+        {
+            "name": "1. البداية (Splash)",
+            "item": [
+                {
+                    "name": "Ping",
+                    "request": {
+                        "method": "GET",
+                        "description": "فحص سريع أن الخادم يعمل.",
+                        "url": {
+                            "raw": "{{baseUrl}}/ping",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "ping"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "معلومات المنشأة",
+                    "request": {
+                        "method": "GET",
+                        "description": "الاسم والشعار والألوان وساعات العمل (`opening_hours`) و`open_now`، وقواعد الحجز (`booking`)، و`labels`: الكلمات المناسبة لنوع منشأتك (\"طبيب\"، \"مصففة\"، \"ملعب\"…). استخدمها في كل نصوص التطبيق.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "2. الرئيسية والتصفح",
+            "item": [
+                {
+                    "name": "الصفحة الرئيسية (طلب واحد)",
+                    "request": {
+                        "method": "GET",
+                        "description": "شاشة Home كاملة: `banners`، `categories`، `featured`، `popular`، `staff`، `latest_reviews`، و`queue` (حالة الدور الحي أو null). يحفظ `serviceId` و`staffId` و`categoryId`.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/home",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "home"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);",
+                                    "const d = res.data; if (d.popular.length) pm.collectionVariables.set('serviceId', d.popular[0].id); if (d.staff.length) pm.collectionVariables.set('staffId', d.staff[0].id); if (d.categories.length) pm.collectionVariables.set('categoryId', d.categories[0].id);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "التصنيفات",
+                    "request": {
+                        "method": "GET",
+                        "description": "تصنيفات الخدمات مع `services_count`.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/categories",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "categories"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "خدمات تصنيف",
+                    "request": {
+                        "method": "GET",
+                        "description": "قائمة الخدمات مع ترقيم الصفحات في `meta`.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/services?category_id={{categoryId}}&page=1&per_page=15",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "services"
+                            ],
+                            "query": [
+                                {
+                                    "key": "category_id",
+                                    "value": "{{categoryId}}"
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15"
+                                }
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "بحث وفلترة الخدمات",
+                    "request": {
+                        "method": "GET",
+                        "description": "فلاتر: `q`، `category_id`، `staff_id`، `max_duration`، `featured`، `group` (الجلسات الجماعية). الترتيب: `order` | `price` | `duration` | `popular` | `rating` | `name`.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/services?q=&staff_id={{staffId}}&max_duration=60&sort=price&order=asc",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "services"
+                            ],
+                            "query": [
+                                {
+                                    "key": "q",
+                                    "value": ""
+                                },
+                                {
+                                    "key": "staff_id",
+                                    "value": "{{staffId}}"
+                                },
+                                {
+                                    "key": "max_duration",
+                                    "value": "60"
+                                },
+                                {
+                                    "key": "sort",
+                                    "value": "price"
+                                },
+                                {
+                                    "key": "order",
+                                    "value": "asc"
+                                }
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "تفاصيل خدمة",
+                    "request": {
+                        "method": "GET",
+                        "description": "المدة والسعر، من يقدّمها (`staff`)، التقييم، و`related`. `is_group` و`capacity` للجلسات الجماعية.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/services/{{serviceId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "services",
+                                "{{serviceId}}"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "تقييمات خدمة",
+                    "request": {
+                        "method": "GET",
+                        "description": "تقييمات الزوار لهذه الخدمة مع رد المنشأة (`reply`).",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/services/{{serviceId}}/reviews",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "services",
+                                "{{serviceId}}",
+                                "reviews"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "الفريق",
+                    "request": {
+                        "method": "GET",
+                        "description": "الأطباء/المصففات/الملاعب… أضف `?service_id=` لمعرفة من يقدّم خدمة معيّنة.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/staff",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "staff"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "ملف شخص",
+                    "request": {
+                        "method": "GET",
+                        "description": "النبذة، ساعات العمل (`hours`)، الخدمات، التقييم وآخر التقييمات.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/staff/{{staffId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "staff",
+                                "{{staffId}}"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "تقييمات المنشأة",
+                    "request": {
+                        "method": "GET",
+                        "description": "كل التقييمات مع `meta.average` و`meta.distribution`.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/reviews",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "reviews"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "أفضل وقت للزيارة",
+                    "request": {
+                        "method": "GET",
+                        "description": "خريطة حرارية: `grid[].hours[].level` من 0 (هادئ) إلى 1 (مزدحم)، و`best_times` أهدأ الأوقات، و`now.label` (\"هادئ الآن\").",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/insights/busy-hours",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "insights",
+                                "busy-hours"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "3. حساب العميل",
+            "item": [
+                {
+                    "name": "تسجيل عميل جديد",
+                    "request": {
+                        "method": "POST",
+                        "description": "ينشئ حسابًا في هذه المنشأة ويرجع `token` (يُحفظ تلقائيًا).",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/auth/register",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"طالب تجريبي\",\n  \"email\": \"student.test@example.com\",\n  \"phone\": \"0599000111\",\n  \"password\": \"Secret123\",\n  \"password_confirmation\": \"Secret123\",\n  \"device_name\": \"Postman\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);",
+                                    "if (res.success && res.data.token) { pm.collectionVariables.set('token', res.data.token); console.log('✅ تم حفظ التوكن'); }"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "تسجيل الدخول",
+                    "request": {
+                        "method": "POST",
+                        "description": "يرجع `token` ويُحفظ تلقائيًا في المتغير `token`.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"student.test@example.com\",\n  \"password\": \"Secret123\",\n  \"device_name\": \"Postman\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);",
+                                    "if (res.success && res.data.token) { pm.collectionVariables.set('token', res.data.token); console.log('✅ تم حفظ التوكن'); }"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 حسابي",
+                    "request": {
+                        "method": "GET",
+                        "description": "بيانات الحساب + `reliability`: مؤشر التزامك (0–100) في هذه المنشأة.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/auth/me",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "auth",
+                                "me"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 تعديل حسابي",
+                    "request": {
+                        "method": "PUT",
+                        "description": "الاسم والهاتف (والصورة `avatar` عبر multipart مع POST).",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/auth/profile",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "auth",
+                                "profile"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"طالب تجريبي\",\n  \"phone\": \"0599000111\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "4. الحجز",
+            "item": [
+                {
+                    "name": "شريط الأيام",
+                    "request": {
+                        "method": "GET",
+                        "description": "الأيام القادمة وعدد الأوقات المتاحة (`slots_count`) وأول وقت (`first_time`). يحفظ أول يوم فيه أوقات في `date`.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/availability/days?service_id={{serviceId}}&days=14",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "availability",
+                                "days"
+                            ],
+                            "query": [
+                                {
+                                    "key": "service_id",
+                                    "value": "{{serviceId}}"
+                                },
+                                {
+                                    "key": "days",
+                                    "value": "14"
+                                }
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);",
+                                    "const day = res.data.find(d => d.slots_count > 0); if (day) { pm.collectionVariables.set('date', day.date); console.log('📅 ' + day.label + ' ' + day.date); }"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "الأوقات المتاحة في يوم",
+                    "request": {
+                        "method": "GET",
+                        "description": "كل وقت فيه `time` للعرض و`starts_at` للحجز، و`staff` (من يستطيع خدمتك)، و`seats_left` للجلسات الجماعية. أضف `staff_id` لشخص معيّن. يحفظ أول وقتين.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/availability/slots?service_id={{serviceId}}&date={{date}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "availability",
+                                "slots"
+                            ],
+                            "query": [
+                                {
+                                    "key": "service_id",
+                                    "value": "{{serviceId}}"
+                                },
+                                {
+                                    "key": "date",
+                                    "value": "{{date}}"
+                                }
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);",
+                                    "if (res.data.length) pm.collectionVariables.set('startsAt', res.data[0].starts_at); if (res.data.length > 1) pm.collectionVariables.set('newStartsAt', res.data[res.data.length - 1].starts_at); if (res.meta.can_join_waitlist) console.log('اليوم ممتلئ — جرّب قائمة الانتظار');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 فحص كوبون",
+                    "request": {
+                        "method": "POST",
+                        "description": "يعرض السعر بعد الخصم قبل تأكيد الحجز.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/coupons/check",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "coupons",
+                                "check"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"code\": \"WELCOME10\",\n  \"service_id\": \"{{serviceId}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 احجز",
+                    "request": {
+                        "method": "POST",
+                        "description": "أرسل `starts_at` كما جاء من الأوقات المتاحة. `staff_id` فارغ = \"أي شخص متاح\". `answers` = إجابات `booking.intake_fields` من معلومات المنشأة. إذا سبقك أحد: `SLOT_UNAVAILABLE` مع `error.details.alternatives`. يحفظ `bookingId`.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/bookings",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "bookings"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"service_id\": \"{{serviceId}}\",\n  \"staff_id\": null,\n  \"starts_at\": \"{{startsAt}}\",\n  \"notes\": \"أول زيارة\",\n  \"answers\": {},\n  \"coupon_code\": null,\n  \"payment_method\": \"cash\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);",
+                                    "if (res.success) { pm.collectionVariables.set('bookingId', res.data.id); console.log('رقم الحجز: ' + res.data.number + ' — كود الوصول: ' + res.data.code); }"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 حجوزاتي القادمة",
+                    "request": {
+                        "method": "GET",
+                        "description": "`scope`: `upcoming` أو `past`.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/bookings?scope=upcoming",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "bookings"
+                            ],
+                            "query": [
+                                {
+                                    "key": "scope",
+                                    "value": "upcoming"
+                                }
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 تفاصيل حجز",
+                    "request": {
+                        "method": "GET",
+                        "description": "فيه `code` و`qr` (اعرضه كرمز QR لتسجيل الوصول)، و`timeline`، و`can_cancel` / `can_reschedule` / `can_review`، و`cancel_is_late`.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/bookings/{{bookingId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "bookings",
+                                "{{bookingId}}"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 تغيير الموعد",
+                    "request": {
+                        "method": "POST",
+                        "description": "مسموح حتى `cancel_before_hours` قبل الموعد.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/bookings/{{bookingId}}/reschedule",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "bookings",
+                                "{{bookingId}}",
+                                "reschedule"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"starts_at\": \"{{newStartsAt}}\",\n  \"staff_id\": null\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 إلغاء الحجز",
+                    "request": {
+                        "method": "POST",
+                        "description": "الإلغاء المتأخر (`cancel_is_late`) يخفّض مؤشر الالتزام.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/bookings/{{bookingId}}/cancel",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "bookings",
+                                "{{bookingId}}",
+                                "cancel"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"reason\": \"ظرف طارئ\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 قيّم زيارتك",
+                    "request": {
+                        "method": "POST",
+                        "description": "بعد اكتمال الحجز (`completed`) فقط.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/bookings/{{bookingId}}/review",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "bookings",
+                                "{{bookingId}}",
+                                "review"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"rating\": 5,\n  \"comment\": \"تجربة ممتازة\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "5. قائمة الانتظار الذكية",
+            "item": [
+                {
+                    "name": "🔒 انضم لقائمة الانتظار",
+                    "request": {
+                        "method": "POST",
+                        "description": "عندما يكون اليوم ممتلئًا. عند أي إلغاء يصلك عرض (إشعار) بوقت متاح. يحفظ `entryId`.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/waitlist",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "waitlist"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"service_id\": \"{{serviceId}}\",\n  \"staff_id\": null,\n  \"date\": \"{{date}}\",\n  \"from_time\": \"16:00\",\n  \"to_time\": \"20:00\",\n  \"notes\": \"أي وقت بعد الدوام\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);",
+                                    "if (res.success) pm.collectionVariables.set('entryId', res.data.id);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 طلباتي في الانتظار",
+                    "request": {
+                        "method": "GET",
+                        "description": "`status`: `waiting` | `offered` | `booked` | `expired` | `cancelled`.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/waitlist?active=1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "waitlist"
+                            ],
+                            "query": [
+                                {
+                                    "key": "active",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 حالة طلب انتظار",
+                    "request": {
+                        "method": "GET",
+                        "description": "عند `offered`: `offer.time` و`offer.seconds_left` (عدّاد تنازلي في التطبيق).",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/waitlist/{{entryId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "waitlist",
+                                "{{entryId}}"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 احجز الوقت المعروض",
+                    "request": {
+                        "method": "POST",
+                        "description": "يحوّل العرض إلى حجز. إذا سبقك أحد: `SLOT_TAKEN` وتبقى في مكانك.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/waitlist/{{entryId}}/claim",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "waitlist",
+                                "{{entryId}}",
+                                "claim"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 غادر قائمة الانتظار",
+                    "request": {
+                        "method": "DELETE",
+                        "description": "إلغاء طلب الانتظار.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/waitlist/{{entryId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "waitlist",
+                                "{{entryId}}"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "6. الدور الحي",
+            "item": [
+                {
+                    "name": "لوحة الدور",
+                    "request": {
+                        "method": "GET",
+                        "description": "من يُخدم الآن (`now_serving`)، عدد المنتظرين، والانتظار المتوقع. حدّثها كل 15–30 ثانية.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/queue",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "queue"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 خذ رقمًا",
+                    "request": {
+                        "method": "POST",
+                        "description": "أثناء ساعات العمل والدور مفعّل. يرجع `label` مثل A-007 و`ahead` و`estimated_wait_minutes`. يحفظ `ticketId`.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/queue/tickets",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "queue",
+                                "tickets"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"service_id\": null\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);",
+                                    "if (res.success) { pm.collectionVariables.set('ticketId', res.data.id); console.log('رقمك: ' + res.data.label); }"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 رقمي اليوم",
+                    "request": {
+                        "method": "GET",
+                        "description": "موقعك في الدور والوقت المتوقع. `data` = null إن لم يكن لديك رقم.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/queue/my-ticket",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "queue",
+                                "my-ticket"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 إلغاء رقمي",
+                    "request": {
+                        "method": "POST",
+                        "description": "مسموح قبل النداء.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/queue/tickets/{{ticketId}}/cancel",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "queue",
+                                "tickets",
+                                "{{ticketId}}",
+                                "cancel"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "7. الإشعارات وتسجيل الخروج",
+            "item": [
+                {
+                    "name": "🔒 إشعاراتي",
+                    "request": {
+                        "method": "GET",
+                        "description": "تأكيد/إلغاء الحجز، عروض الانتظار، \"جاء دورك\". `url` مسار داخل التطبيق مثل `bookings/12`.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/notifications",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "notifications"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 تعليم الكل كمقروء",
+                    "request": {
+                        "method": "POST",
+                        "description": "",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/notifications/read-all",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "notifications",
+                                "read-all"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "🔒 تسجيل الخروج",
+                    "request": {
+                        "method": "POST",
+                        "description": "يحذف التوكن الحالي.",
+                        "url": {
+                            "raw": "{{baseUrl}}/places/{{placeSlug}}/auth/logout",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "places",
+                                "{{placeSlug}}",
+                                "auth",
+                                "logout"
+                            ]
+                        },
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar"
+                            }
+                        ],
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "pm.test('success = true', () => pm.expect(res.success).to.be.true);",
+                                    "pm.collectionVariables.set('token', '');"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "https://dori.toldpath.com/api/v1",
+            "description": "رابط الخادم — لا تغيّره"
+        },
+        {
+            "key": "placeSlug",
+            "value": "la7za",
+            "description": "رابط منشأتك — جاهز، لا تغيّره"
+        },
+        {
+            "key": "token",
+            "value": "",
+            "description": "يُحفظ تلقائيًا بعد تسجيل الدخول"
+        },
+        {
+            "key": "serviceId",
+            "value": "",
+            "description": "يُحفظ تلقائيًا من الصفحة الرئيسية"
+        },
+        {
+            "key": "staffId",
+            "value": "",
+            "description": "يُحفظ تلقائيًا من الصفحة الرئيسية"
+        },
+        {
+            "key": "categoryId",
+            "value": "",
+            "description": "يُحفظ تلقائيًا من الصفحة الرئيسية"
+        },
+        {
+            "key": "date",
+            "value": "",
+            "description": "يُحفظ تلقائيًا من شريط الأيام"
+        },
+        {
+            "key": "startsAt",
+            "value": "",
+            "description": "يُحفظ تلقائيًا من الأوقات المتاحة"
+        },
+        {
+            "key": "newStartsAt",
+            "value": "",
+            "description": "وقت آخر لتجربة تغيير الموعد"
+        },
+        {
+            "key": "bookingId",
+            "value": "",
+            "description": "يُحفظ تلقائيًا بعد الحجز"
+        },
+        {
+            "key": "entryId",
+            "value": "",
+            "description": "يُحفظ تلقائيًا عند الانضمام للانتظار"
+        },
+        {
+            "key": "ticketId",
+            "value": "",
+            "description": "يُحفظ تلقائيًا عند أخذ رقم"
+        }
+    ]
+}

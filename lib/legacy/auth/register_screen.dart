@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import 'package:dori_lahza/utils/app_colors.dart';
-import 'package:dori_lahza/controllers/auth/auth_controller.dart';
-import 'package:dori_lahza/routes/app_routes.dart';
+import 'package:dori_lahza/legacy/utils/app_colors.dart';
+import 'package:dori_lahza/legacy/controllers/auth/auth_controller.dart';
+import 'package:dori_lahza/legacy/routes/app_routes.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
