@@ -7,6 +7,7 @@ import 'package:dori_lahza/core/widgets/message_view.dart';
 import 'package:dori_lahza/features/account/presentation/widgets/reliability_card.dart';
 import 'package:dori_lahza/features/auth/domain/entities/user.dart';
 import 'package:dori_lahza/features/auth/presentation/controllers/session_controller.dart';
+import 'package:dori_lahza/features/notifications/presentation/controllers/notifications_controllers.dart';
 import 'package:dori_lahza/features/place/presentation/controllers/place_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -59,6 +60,7 @@ class AccountView extends GetView<SessionController> {
                       icon: Icons.notifications_none_rounded,
                       title: 'الإشعارات',
                       onTap: () => Get.toNamed<void>(AppRoutes.notifications),
+                      badge: Get.find<UnreadBadgeController>().unread.value,
                     ),
                   ],
                   _MenuTile(
@@ -175,12 +177,19 @@ class _MenuGroup extends StatelessWidget {
 }
 
 class _MenuTile extends StatelessWidget {
-  const _MenuTile({required this.icon, required this.title, required this.onTap, this.destructive = false});
+  const _MenuTile({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+    this.destructive = false,
+    this.badge = 0,
+  });
 
   final IconData icon;
   final String title;
   final VoidCallback onTap;
   final bool destructive;
+  final int badge;
 
   @override
   Widget build(BuildContext context) {
@@ -201,7 +210,15 @@ class _MenuTile extends StatelessWidget {
         title,
         style: context.text.labelLarge?.copyWith(color: destructive ? p.danger : p.textPrimary),
       ),
-      trailing: destructive ? null : Icon(Icons.chevron_right_rounded, color: p.textMuted),
+      trailing: destructive
+          ? null
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (badge > 0) Badge.count(count: badge, backgroundColor: p.danger),
+                Icon(Icons.chevron_right_rounded, color: p.textMuted),
+              ],
+            ),
     );
   }
 }

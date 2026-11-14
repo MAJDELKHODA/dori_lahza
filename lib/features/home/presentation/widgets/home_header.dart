@@ -1,10 +1,10 @@
 import 'package:dori_lahza/app/routes/app_nav.dart';
-import 'package:dori_lahza/app/routes/app_routes.dart';
 import 'package:dori_lahza/core/theme/app_dimens.dart';
 import 'package:dori_lahza/core/theme/app_palette.dart';
 import 'package:dori_lahza/core/widgets/layout.dart';
 import 'package:dori_lahza/core/widgets/media.dart';
 import 'package:dori_lahza/features/auth/presentation/controllers/session_controller.dart';
+import 'package:dori_lahza/features/notifications/presentation/controllers/notifications_controllers.dart';
 import 'package:dori_lahza/features/place/presentation/controllers/place_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -65,12 +65,20 @@ class HomeHeader extends StatelessWidget {
               ),
             ),
             if (user != null)
-              IconButton.filledTonal(
-                tooltip: 'الإشعارات',
-                style: IconButton.styleFrom(backgroundColor: p.surface, side: BorderSide(color: p.border)),
-                onPressed: () => Get.toNamed<void>(AppRoutes.notifications),
-                icon: Icon(Icons.notifications_none_rounded, color: p.textPrimary),
-              ),
+              Obx(() {
+                final unread = Get.find<UnreadBadgeController>().unread.value;
+                return IconButton.filledTonal(
+                  tooltip: 'الإشعارات',
+                  style: IconButton.styleFrom(backgroundColor: p.surface, side: BorderSide(color: p.border)),
+                  onPressed: AppNav.notifications,
+                  icon: Badge.count(
+                    count: unread,
+                    isLabelVisible: unread > 0,
+                    backgroundColor: p.danger,
+                    child: Icon(Icons.notifications_none_rounded, color: p.textPrimary),
+                  ),
+                );
+              }),
           ],
         );
       }),

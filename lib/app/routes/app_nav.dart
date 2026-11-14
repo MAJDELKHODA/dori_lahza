@@ -31,6 +31,10 @@ abstract final class AppNav {
   static Future<bool?>? waitlistEntry(int entryId) =>
       Get.toNamed<bool>(AppRoutes.waitlistEntry, arguments: entryId, preventDuplicates: false);
 
+  static Future<void>? waitlist() => Get.toNamed<void>(AppRoutes.waitlist);
+
+  static Future<void>? notifications() => Get.toNamed<void>(AppRoutes.notifications);
+
   static Future<void>? bookingDetails(int bookingId, {Booking? initial}) => Get.toNamed<void>(
         AppRoutes.bookingDetails,
         arguments: BookingDetailsArgs(bookingId, initial: initial),

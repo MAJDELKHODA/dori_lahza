@@ -11,6 +11,9 @@ import 'package:dori_lahza/features/home/domain/repositories/home_repository.dar
 import 'package:dori_lahza/features/insights/data/datasources/insights_remote_data_source.dart';
 import 'package:dori_lahza/features/insights/data/repositories/insights_repository_impl.dart';
 import 'package:dori_lahza/features/insights/domain/repositories/insights_repository.dart';
+import 'package:dori_lahza/features/notifications/data/datasources/notifications_remote_data_source.dart';
+import 'package:dori_lahza/features/notifications/data/repositories/notifications_repository_impl.dart';
+import 'package:dori_lahza/features/notifications/domain/repositories/notifications_repository.dart';
 import 'package:dori_lahza/features/queue/data/datasources/queue_remote_data_source.dart';
 import 'package:dori_lahza/features/queue/data/repositories/queue_repository_impl.dart';
 import 'package:dori_lahza/features/queue/domain/repositories/queue_repository.dart';
@@ -59,6 +62,10 @@ abstract final class DataBinding {
         () => WaitlistRepositoryImpl(WaitlistRemoteDataSource(client())),
         fenix: true,
       )
-      ..lazyPut<QueueRepository>(() => QueueRepositoryImpl(QueueRemoteDataSource(client())), fenix: true);
+      ..lazyPut<QueueRepository>(() => QueueRepositoryImpl(QueueRemoteDataSource(client())), fenix: true)
+      ..lazyPut<NotificationsRepository>(
+        () => NotificationsRepositoryImpl(NotificationsRemoteDataSource(client())),
+        fenix: true,
+      );
   }
 }

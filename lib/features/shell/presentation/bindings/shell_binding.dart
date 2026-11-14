@@ -2,6 +2,7 @@ import 'package:dori_lahza/features/bookings/presentation/bindings/bookings_bind
 import 'package:dori_lahza/features/home/domain/repositories/home_repository.dart';
 import 'package:dori_lahza/features/home/domain/usecases/get_home_feed.dart';
 import 'package:dori_lahza/features/home/presentation/controllers/home_controller.dart';
+import 'package:dori_lahza/features/notifications/presentation/bindings/notifications_bindings.dart';
 import 'package:dori_lahza/features/queue/presentation/bindings/queue_dependencies.dart';
 import 'package:dori_lahza/features/services/presentation/bindings/services_bindings.dart';
 import 'package:dori_lahza/features/shell/presentation/controllers/shell_controller.dart';
@@ -25,5 +26,6 @@ class ShellBinding extends Bindings {
     ServicesDependencies.registerTab();
     BookingsDependencies.registerTab();
     QueueDependencies.registerTab();
+    NotificationsDependencies.registerBadge();
   }
 }

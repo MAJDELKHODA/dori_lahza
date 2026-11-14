@@ -15,6 +15,8 @@ import 'package:dori_lahza/features/bookings/presentation/views/booking_details_
 import 'package:dori_lahza/features/bookings/presentation/views/reschedule_view.dart';
 import 'package:dori_lahza/features/insights/presentation/bindings/busy_hours_binding.dart';
 import 'package:dori_lahza/features/insights/presentation/views/busy_hours_view.dart';
+import 'package:dori_lahza/features/notifications/presentation/bindings/notifications_bindings.dart';
+import 'package:dori_lahza/features/notifications/presentation/views/notifications_view.dart';
 import 'package:dori_lahza/features/place/presentation/views/place_info_view.dart';
 import 'package:dori_lahza/features/reviews/domain/usecases/reviews_usecases.dart';
 import 'package:dori_lahza/features/reviews/presentation/bindings/reviews_binding.dart';
@@ -103,6 +105,9 @@ abstract final class AppPages {
       page: () => WaitlistEntryView(entryId: _id),
       binding: BindingsBuilder(() => WaitlistEntryBinding(_id).dependencies()),
     ),
+
+    // Notifications
+    GetPage(name: AppRoutes.notifications, page: () => const NotificationsView(), binding: NotificationsBinding()),
   ];
 
   /// Integer id passed as the route argument.
