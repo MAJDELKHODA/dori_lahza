@@ -1,4 +1,10 @@
 import 'package:dori_lahza/core/network/dio_client.dart';
+import 'package:dori_lahza/features/booking/data/datasources/booking_remote_data_source.dart';
+import 'package:dori_lahza/features/booking/data/repositories/booking_repository_impl.dart';
+import 'package:dori_lahza/features/booking/domain/repositories/booking_repository.dart';
+import 'package:dori_lahza/features/bookings/data/datasources/bookings_remote_data_source.dart';
+import 'package:dori_lahza/features/bookings/data/repositories/bookings_repository_impl.dart';
+import 'package:dori_lahza/features/bookings/domain/repositories/bookings_repository.dart';
 import 'package:dori_lahza/features/home/data/datasources/home_remote_data_source.dart';
 import 'package:dori_lahza/features/home/data/repositories/home_repository_impl.dart';
 import 'package:dori_lahza/features/home/domain/repositories/home_repository.dart';
@@ -14,6 +20,9 @@ import 'package:dori_lahza/features/services/domain/repositories/services_reposi
 import 'package:dori_lahza/features/staff/data/datasources/staff_remote_data_source.dart';
 import 'package:dori_lahza/features/staff/data/repositories/staff_repository_impl.dart';
 import 'package:dori_lahza/features/staff/domain/repositories/staff_repository.dart';
+import 'package:dori_lahza/features/waitlist/data/datasources/waitlist_remote_data_source.dart';
+import 'package:dori_lahza/features/waitlist/data/repositories/waitlist_repository_impl.dart';
+import 'package:dori_lahza/features/waitlist/domain/repositories/waitlist_repository.dart';
 import 'package:get/get.dart';
 
 /// Registers every feature repository lazily (`fenix` re-creates them after
@@ -36,6 +45,15 @@ abstract final class DataBinding {
       )
       ..lazyPut<InsightsRepository>(
         () => InsightsRepositoryImpl(InsightsRemoteDataSource(client())),
+        fenix: true,
+      )
+      ..lazyPut<BookingRepository>(() => BookingRepositoryImpl(BookingRemoteDataSource(client())), fenix: true)
+      ..lazyPut<BookingsRepository>(
+        () => BookingsRepositoryImpl(BookingsRemoteDataSource(client())),
+        fenix: true,
+      )
+      ..lazyPut<WaitlistRepository>(
+        () => WaitlistRepositoryImpl(WaitlistRemoteDataSource(client())),
         fenix: true,
       );
   }

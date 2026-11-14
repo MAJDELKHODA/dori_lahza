@@ -1,4 +1,5 @@
 import 'package:dori_lahza/features/account/presentation/views/account_view.dart';
+import 'package:dori_lahza/features/bookings/presentation/views/my_bookings_view.dart';
 import 'package:dori_lahza/features/home/presentation/views/home_view.dart';
 import 'package:dori_lahza/features/place/presentation/controllers/place_controller.dart';
 import 'package:dori_lahza/features/services/presentation/views/services_view.dart';
@@ -32,6 +33,13 @@ class ShellView extends GetView<ShellController> {
         Icons.grid_view_rounded,
         labels.servicePlural,
         ServicesView.new,
+      ),
+      const _TabSpec(
+        ShellTab.bookings,
+        Icons.event_note_outlined,
+        Icons.event_note_rounded,
+        'حجوزاتي',
+        MyBookingsView.new,
       ),
       const _TabSpec(ShellTab.account, Icons.person_outline_rounded, Icons.person_rounded, 'حسابي', AccountView.new),
     ];

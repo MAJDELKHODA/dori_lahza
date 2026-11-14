@@ -1,3 +1,4 @@
+import 'package:dori_lahza/features/bookings/presentation/bindings/bookings_bindings.dart';
 import 'package:dori_lahza/features/home/domain/repositories/home_repository.dart';
 import 'package:dori_lahza/features/home/domain/usecases/get_home_feed.dart';
 import 'package:dori_lahza/features/home/presentation/controllers/home_controller.dart';
@@ -21,5 +22,6 @@ class ShellBinding extends Bindings {
         fenix: true,
       );
     ServicesDependencies.registerTab();
+    BookingsDependencies.registerTab();
   }
 }
