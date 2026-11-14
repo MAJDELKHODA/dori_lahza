@@ -53,9 +53,10 @@ abstract final class AvailabilityModel {
     );
   }
 
+  /// Wall-clock `HH:mm` of the place, read from the text so the offset is
+  /// not applied (`DateTime.parse` would convert to UTC).
   static String _hhmm(String iso) {
-    final d = DateTime.tryParse(iso);
-    if (d == null) return iso;
-    return '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+    final match = RegExp(r'T(\d{2}:\d{2})').firstMatch(iso);
+    return match?.group(1) ?? iso;
   }
 }
