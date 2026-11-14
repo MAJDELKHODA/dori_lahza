@@ -184,7 +184,7 @@ class _Body extends StatelessWidget {
               const SectionHeader(title: 'يقدّمها'),
               const VSpace(Gap.xs),
               HorizontalStrip(
-                height: 116,
+                height: 124,
                 spacing: Gap.xs,
                 itemCount: service.staff.length,
                 itemBuilder: (_, i) {

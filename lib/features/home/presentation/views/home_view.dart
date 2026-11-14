@@ -64,7 +64,7 @@ class HomeView extends GetView<HomeController> {
                     ),
                     const VSpace(Gap.xs),
                     HorizontalStrip(
-                      height: 104,
+                      height: 112,
                       itemCount: feed.categories.length,
                       itemBuilder: (_, i) {
                         final c = feed.categories[i];
@@ -115,7 +115,7 @@ class HomeView extends GetView<HomeController> {
                     SectionHeader(title: labels.staffPlural, actionLabel: 'الكل', onAction: AppNav.team),
                     const VSpace(Gap.xs),
                     HorizontalStrip(
-                      height: 116,
+                      height: 124,
                       spacing: Gap.xs,
                       itemCount: feed.staff.length,
                       itemBuilder: (_, i) {

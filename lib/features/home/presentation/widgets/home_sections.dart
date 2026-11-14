@@ -215,12 +215,16 @@ class CategoryTile extends StatelessWidget {
                   : Icon(IconMapper.fromName(category.icon), color: p.strong, size: 28),
             ),
             const VSpace(Gap.xs),
-            Text(
-              category.name,
-              maxLines: 2,
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              style: context.text.labelSmall?.copyWith(color: p.textPrimary, fontWeight: FontWeight.w600),
+            // Takes whatever height the strip leaves, so long names or a larger
+            // system text size ellipsize instead of overflowing the tile.
+            Expanded(
+              child: Text(
+                category.name,
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: context.text.labelSmall?.copyWith(color: p.textPrimary, fontWeight: FontWeight.w600),
+              ),
             ),
           ],
         ),
