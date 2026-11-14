@@ -98,16 +98,13 @@ class HomeView extends GetView<HomeController> {
                       onAction: controller.openAllServices,
                     ),
                     const VSpace(Gap.xs),
-                    Padding(
-                      padding: Gap.pagePadding,
-                      child: Column(
-                        children: [
-                          for (final s in feed.popular.take(4)) ...[
-                            ServiceTile(service: s, onTap: () => AppNav.serviceDetails(s.id)),
-                            const VSpace(Gap.sm),
-                          ],
-                        ],
-                      ),
+                    HorizontalStrip(
+                      height: 252,
+                      itemCount: feed.popular.length,
+                      itemBuilder: (_, i) {
+                        final s = feed.popular[i];
+                        return ServiceCard(service: s, onTap: () => AppNav.serviceDetails(s.id));
+                      },
                     ),
                   ],
                   const VSpace(Gap.xl),

@@ -71,7 +71,11 @@ class ServiceMeta extends StatelessWidget {
       );
 }
 
-/// Vertical card for horizontal carousels (featured).
+/// Vertical card for horizontal carousels (featured, popular, related).
+///
+/// Needs a bounded height (the strip's). The image takes the space the text
+/// leaves, so a larger system text size shrinks the image instead of
+/// overflowing the card.
 class ServiceCard extends StatelessWidget {
   const ServiceCard({super.key, required this.service, required this.onTap, this.width = 230});
 
@@ -89,16 +93,19 @@ class ServiceCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(
-              children: [
-                AppNetworkImage(url: service.thumb ?? service.image, height: 130, width: width, radius: 0),
-                if (service.discountPercent != null && service.hasDiscount)
-                  PositionedDirectional(
-                    top: Gap.xs,
-                    start: Gap.xs,
-                    child: Pill(label: 'خصم ${service.discountPercent}%', tone: Tone.danger),
-                  ),
-              ],
+            Expanded(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  AppNetworkImage(url: service.thumb ?? service.image, radius: 0),
+                  if (service.discountPercent != null && service.hasDiscount)
+                    PositionedDirectional(
+                      top: Gap.xs,
+                      start: Gap.xs,
+                      child: Pill(label: 'خصم ${service.discountPercent}%', tone: Tone.danger),
+                    ),
+                ],
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(Gap.sm),
