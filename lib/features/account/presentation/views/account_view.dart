@@ -1,3 +1,4 @@
+import 'package:dori_lahza/app/routes/app_nav.dart';
 import 'package:dori_lahza/app/routes/app_routes.dart';
 import 'package:dori_lahza/core/theme/app_dimens.dart';
 import 'package:dori_lahza/core/theme/app_palette.dart';
@@ -51,10 +52,10 @@ class AccountView extends GetView<SessionController> {
               _MenuGroup(
                 children: [
                   if (user != null) ...[
-                    _MenuTile(
+                    const _MenuTile(
                       icon: Icons.hourglass_top_rounded,
                       title: 'قائمة الانتظار',
-                      onTap: () => Get.toNamed<void>(AppRoutes.waitlist),
+                      onTap: AppNav.waitlist,
                     ),
                     _MenuTile(
                       icon: Icons.notifications_none_rounded,

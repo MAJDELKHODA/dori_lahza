@@ -1,5 +1,7 @@
+import 'package:dori_lahza/app/routes/app_nav.dart';
 import 'package:dori_lahza/core/theme/app_dimens.dart';
 import 'package:dori_lahza/core/theme/app_palette.dart';
+import 'package:dori_lahza/core/utils/feedback.dart';
 import 'package:dori_lahza/core/widgets/layout.dart';
 import 'package:dori_lahza/features/auth/presentation/controllers/session_controller.dart';
 import 'package:dori_lahza/features/waitlist/domain/repositories/waitlist_repository.dart';
@@ -8,7 +10,7 @@ import 'package:dori_lahza/features/waitlist/presentation/controllers/join_waitl
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class JoinWaitlistSheet extends StatelessWidget {
+class JoinWaitlistSheet extends StatefulWidget {
   const JoinWaitlistSheet({super.key, required this.controller, required this.serviceName, required this.dayLabel});
 
   final JoinWaitlistController controller;
@@ -34,11 +36,32 @@ class JoinWaitlistSheet extends StatelessWidget {
       ),
       tag: tag,
     );
-    await Get.bottomSheet<void>(
+    final joined = await Get.bottomSheet<bool>(
       JoinWaitlistSheet(controller: controller, serviceName: serviceName, dayLabel: dayLabel),
       isScrollControlled: true,
     );
     await Get.delete<JoinWaitlistController>(tag: tag);
+    if (joined ?? false) {
+      AppFeedback.success('انضممت لقائمة الانتظار، سنرسل لك إشعارًا عند توفر وقت');
+      await AppNav.waitlist();
+    }
+  }
+
+  @override
+  State<JoinWaitlistSheet> createState() => _JoinWaitlistSheetState();
+}
+
+/// Owns the notes field so it is disposed with the sheet's route, after the
+/// close animation, never while the TextField is still on screen.
+class _JoinWaitlistSheetState extends State<JoinWaitlistSheet> {
+  final _notes = TextEditingController();
+
+  JoinWaitlistController get controller => widget.controller;
+
+  @override
+  void dispose() {
+    _notes.dispose();
+    super.dispose();
   }
 
   @override
@@ -49,7 +72,7 @@ class JoinWaitlistSheet extends StatelessWidget {
       borderRadius: Radii.sheet,
       child: SheetBody(
         title: 'قائمة الانتظار',
-        subtitle: '$serviceName · $dayLabel',
+        subtitle: '${widget.serviceName} · ${widget.dayLabel}',
         child: Obx(
           () => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -81,7 +104,7 @@ class JoinWaitlistSheet extends StatelessWidget {
               ],
               const VSpace(Gap.md),
               TextField(
-                controller: controller.notes,
+                controller: _notes,
                 maxLines: 2,
                 decoration: const InputDecoration(labelText: 'ملاحظات (اختياري)', hintText: 'مثال: أي وقت بعد الدوام'),
               ),
@@ -102,7 +125,7 @@ class JoinWaitlistSheet extends StatelessWidget {
               LoadingButton(
                 label: 'انضم لقائمة الانتظار',
                 loading: controller.isSubmitting.value,
-                onPressed: controller.submit,
+                onPressed: () => controller.submit(_notes.text),
               ),
             ],
           ),

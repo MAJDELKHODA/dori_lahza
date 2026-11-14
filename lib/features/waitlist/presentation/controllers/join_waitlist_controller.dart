@@ -1,4 +1,3 @@
-import 'package:dori_lahza/app/routes/app_routes.dart';
 import 'package:dori_lahza/core/utils/feedback.dart';
 import 'package:dori_lahza/features/waitlist/domain/entities/waitlist_entry.dart';
 import 'package:dori_lahza/features/waitlist/domain/usecases/waitlist_usecases.dart';
@@ -21,7 +20,6 @@ class JoinWaitlistController extends GetxController {
 
   final fromTime = Rxn<TimeOfDay>();
   final toTime = Rxn<TimeOfDay>();
-  final notes = TextEditingController();
   final isSubmitting = false.obs;
   final rangeError = RxnString();
 
@@ -43,7 +41,9 @@ class JoinWaitlistController extends GetxController {
     return !invalid;
   }
 
-  Future<void> submit() async {
+  /// Closes the sheet with `true` on success; the caller navigates once the
+  /// sheet has fully animated out.
+  Future<void> submit(String notes) async {
     if (!_validateRange() || isSubmitting.value) return;
     isSubmitting.value = true;
     final result = await _join(
@@ -53,23 +53,13 @@ class JoinWaitlistController extends GetxController {
         staffId: staffId,
         fromTime: _fmt(fromTime.value),
         toTime: _fmt(toTime.value),
-        notes: notes.text.trim().isEmpty ? null : notes.text.trim(),
+        notes: notes.trim().isEmpty ? null : notes.trim(),
       ),
     );
     isSubmitting.value = false;
-    result.fold(AppFeedback.failure, (_) {
-      Get.back<void>();
-      AppFeedback.success('انضممت لقائمة الانتظار، سنرسل لك إشعارًا عند توفر وقت');
-      Get.toNamed<void>(AppRoutes.waitlist);
-    });
+    result.fold(AppFeedback.failure, (_) => Get.back<bool>(result: true));
   }
 
   static String? _fmt(TimeOfDay? t) =>
       t == null ? null : '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
-
-  @override
-  void onClose() {
-    notes.dispose();
-    super.onClose();
-  }
 }
