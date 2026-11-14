@@ -116,10 +116,4 @@ View ──Obx──> Controller ──> UseCase ──> Repository (interface)
   `strong` أغمق للأزرار والنصوص حتى يكون مقروءًا (تباين 4.5:1)، ويبقى `brand` للخلفيات.
 - الاتجاه RTL بالكامل: `EdgeInsetsDirectional` و `PositionedDirectional`، وأيقونات تنقلب حسب الاتجاه.
 
-## ملاحظات
 
-- الـ collection ما فيها أمثلة ردود للطلبات المحمية (🔒)، فالـ models مبنية من وصف التوثيق
-  وتقرأ الحقول بشكل دفاعي (`core/utils/json.dart`). بعد تجربة حساب حقيقي، طابق أي حقل
-  مختلف داخل ملف الـ model الخاص به.
-- صور `uploads/` على الخادم ما فيها CORS headers، فلا تظهر في نسخة الويب فقط.
-  على Android و iOS تظهر بشكل طبيعي.
