@@ -219,20 +219,31 @@ class _DayChart extends StatelessWidget {
                         child: Tooltip(
                           message: h.open ? '${Fmt.hour(h.hour)} · ${BusyHoursController.levelLabel(h.level)}' : 'مغلق',
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              AnimatedContainer(
-                                duration: const Duration(milliseconds: 400),
-                                curve: Curves.easeOutCubic,
-                                margin: const EdgeInsets.symmetric(horizontal: 4),
-                                height: h.open ? 10 + (_maxBar - 10) * h.level : 4,
-                                decoration: BoxDecoration(
-                                  color: !h.open
-                                      ? p.surfaceMuted
-                                      : h == quiet
-                                          ? p.success.withValues(alpha: 0.55)
-                                          : p.heat(h.level),
-                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(8), bottom: Radius.circular(3)),
+                              // The bar scales to whatever height the hour label
+                              // leaves, so the busiest hour (level 1) never overflows.
+                              Expanded(
+                                child: LayoutBuilder(
+                                  builder: (context, box) => Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 400),
+                                      curve: Curves.easeOutCubic,
+                                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                                      height: h.open ? 10 + (box.maxHeight - 10) * h.level : 4,
+                                      decoration: BoxDecoration(
+                                        color: !h.open
+                                            ? p.surfaceMuted
+                                            : h == quiet
+                                                ? p.success.withValues(alpha: 0.55)
+                                                : p.heat(h.level),
+                                        borderRadius: const BorderRadius.vertical(
+                                          top: Radius.circular(8),
+                                          bottom: Radius.circular(3),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
                               const VSpace(6),
@@ -279,8 +290,18 @@ class _Stat extends StatelessWidget {
         children: [
           Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
           const HSpace(Gap.xs),
-          Text('$label: ', style: context.text.bodySmall),
-          Text(value, style: context.text.labelLarge),
+          Flexible(
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(text: '$label: ', style: context.text.bodySmall),
+                  TextSpan(text: value, style: context.text.labelLarge),
+                ],
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       );
 }
