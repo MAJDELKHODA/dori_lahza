@@ -1,3 +1,5 @@
+import 'package:dori_lahza/features/bookings/domain/repositories/bookings_repository.dart';
+import 'package:dori_lahza/features/bookings/domain/usecases/bookings_usecases.dart';
 import 'package:dori_lahza/features/bookings/presentation/bindings/bookings_bindings.dart';
 import 'package:dori_lahza/features/home/domain/repositories/home_repository.dart';
 import 'package:dori_lahza/features/home/domain/usecases/get_home_feed.dart';
@@ -18,7 +20,9 @@ class ShellBinding extends Bindings {
       ..lazyPut(
         () => HomeController(
           getHomeFeed: GetHomeFeed(Get.find<HomeRepository>()),
+          getNextBooking: GetNextBooking(Get.find<BookingsRepository>()),
           place: Get.find(),
+          session: Get.find(),
           shell: Get.find(),
         ),
         fenix: true,

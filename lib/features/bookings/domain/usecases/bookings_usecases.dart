@@ -13,6 +13,22 @@ class GetMyBookings implements UseCase<Paginated<Booking>, ({BookingScope scope,
       _repository.list(p.scope, page: p.page);
 }
 
+/// The soonest upcoming active booking (pending / confirmed), or null.
+class GetNextBooking implements UseCase<Booking?, NoParams> {
+  const GetNextBooking(this._repository);
+  final BookingsRepository _repository;
+
+  @override
+  Future<Result<Booking?>> call([NoParams params = const NoParams()]) async {
+    final result = await _repository.list(BookingScope.upcoming, page: 1);
+    return result.map((page) {
+      final active = page.items.where((b) => b.isActive && b.startsAt != null).toList()
+        ..sort((a, b) => a.startsAt!.compareTo(b.startsAt!));
+      return active.isEmpty ? null : active.first;
+    });
+  }
+}
+
 class GetBookingDetails implements UseCase<Booking, int> {
   const GetBookingDetails(this._repository);
   final BookingsRepository _repository;

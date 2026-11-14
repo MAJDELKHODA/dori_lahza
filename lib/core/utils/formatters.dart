@@ -47,6 +47,20 @@ abstract final class Fmt {
     return shortDate(date);
   }
 
+  /// Time left until a future moment: `بعد 25 دقيقة`, `بعد 3 ساعات`, `غدًا`, `بعد 4 أيام`.
+  static String until(DateTime date, {DateTime? now}) {
+    final from = now ?? DateTime.now();
+    final diff = date.difference(from);
+    if (diff.isNegative || diff.inMinutes < 1) return 'الآن';
+    if (diff.inMinutes < 60) return 'بعد ${diff.inMinutes} دقيقة';
+    final today = DateTime(from.year, from.month, from.day);
+    final days = DateTime(date.year, date.month, date.day).difference(today).inDays;
+    if (days == 0) return diff.inHours == 1 ? 'بعد ساعة' : 'بعد ${diff.inHours} ساعات';
+    if (days == 1) return 'غدًا';
+    if (days == 2) return 'بعد يومين';
+    return 'بعد $days أيام';
+  }
+
   /// `02:45` countdown.
   static String countdown(int seconds) {
     final s = seconds < 0 ? 0 : seconds;

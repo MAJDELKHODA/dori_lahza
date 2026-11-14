@@ -5,7 +5,8 @@ import 'package:dori_lahza/core/widgets/layout.dart';
 import 'package:dori_lahza/core/widgets/state_view.dart';
 import 'package:dori_lahza/features/home/domain/entities/home_feed.dart';
 import 'package:dori_lahza/features/home/presentation/controllers/home_controller.dart';
-import 'package:dori_lahza/features/home/presentation/widgets/home_header.dart';
+import 'package:dori_lahza/features/home/presentation/widgets/home_hero.dart';
+import 'package:dori_lahza/features/home/presentation/widgets/home_highlights.dart';
 import 'package:dori_lahza/features/home/presentation/widgets/home_sections.dart';
 import 'package:dori_lahza/features/home/presentation/widgets/home_skeleton.dart';
 import 'package:dori_lahza/features/place/presentation/controllers/place_controller.dart';
@@ -22,8 +23,10 @@ class HomeView extends GetView<HomeController> {
   Widget build(BuildContext context) {
     final labels = Get.find<PlaceController>().labels;
     return Scaffold(
-      body: SafeArea(
-        bottom: false,
+      // No top SafeArea: the hero cover runs under the status bar.
+      body: MediaQuery.removePadding(
+        context: context,
+        removeBottom: true,
         child: Obx(
           () => StateView<HomeFeed>(
             state: controller.state.value,
@@ -35,8 +38,8 @@ class HomeView extends GetView<HomeController> {
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.only(bottom: Gap.xxl),
                 children: [
-                  const HomeHeader(),
-                  const VSpace(Gap.md),
+                  HomeHero(controller: controller),
+                  const VSpace(Gap.lg),
                   Padding(
                     padding: Gap.pagePadding,
                     child: SearchEntry(
@@ -44,6 +47,9 @@ class HomeView extends GetView<HomeController> {
                       onTap: controller.openSearch,
                     ),
                   ),
+                  const VSpace(Gap.lg),
+                  QuickActions(controller: controller),
+                  NextBookingCard(controller: controller),
                   if (feed.banners.isNotEmpty) ...[
                     const VSpace(Gap.lg),
                     BannerCarousel(banners: feed.banners, onTap: controller.openBanner),
