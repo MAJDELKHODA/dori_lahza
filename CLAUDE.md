@@ -71,4 +71,4 @@ flutter test
   strings, not from converting `DateTime`s (that would shift the offset).
 - The live-queue `Poller` runs only while the queue tab is visible and the app is in the foreground.
   The waitlist entry page polls every 30 s while `waiting`, and a `Countdown` drives `seconds_left`.
-- Commit messages end with the Co-Authored-By line used in the history.
+- Commits are authored by the repository owner only: never add `Co-Authored-By` trailers or other AI attribution.
