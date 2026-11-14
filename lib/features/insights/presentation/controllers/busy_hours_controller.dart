@@ -16,6 +16,11 @@ class BusyHoursController extends GetxController {
   /// Day shown in the hourly chart; defaults to today.
   final selectedDay = DayHours.weekdayKey(DateTime.now()).obs;
 
+  /// The full weekly grid is folded by default to keep the screen calm.
+  final showWeek = false.obs;
+
+  String get todayKey => DayHours.weekdayKey(DateTime.now());
+
   @override
   void onReady() {
     super.onReady();
@@ -29,6 +34,8 @@ class BusyHoursController extends GetxController {
 
   void selectDay(String day) => selectedDay.value = day;
 
+  void toggleWeek() => showWeek.toggle();
+
   BusyDay? dayOf(BusyHours data) {
     for (final d in data.days) {
       if (d.day == selectedDay.value) return d;
@@ -36,7 +43,21 @@ class BusyHoursController extends GetxController {
     return data.days.isEmpty ? null : data.days.first;
   }
 
-  /// Level label for a busy level (matches the API's own wording).
+  /// Quietest suggestion for today, otherwise the overall quietest time.
+  BestTime? suggestion(BusyHours data) =>
+      data.bestTimes.firstWhereOrNull((b) => b.day == todayKey) ?? data.bestTimes.firstOrNull;
+
+  /// Quietest and busiest open hours of [day] (null when closed all day).
+  ({BusyHour? quiet, BusyHour? peak}) extremes(BusyDay? day) {
+    final open = day?.hours.where((h) => h.open).toList() ?? const <BusyHour>[];
+    if (open.isEmpty) return (quiet: null, peak: null);
+    final quiet = open.reduce((a, b) => b.level < a.level ? b : a);
+    final peak = open.reduce((a, b) => b.level > a.level ? b : a);
+    // A flat day has no meaningful peak.
+    return (quiet: quiet, peak: peak.level > quiet.level ? peak : null);
+  }
+
+  /// Level wording for a busy level.
   static String levelLabel(double level) => switch (level) {
         <= 0.0 => 'هادئ',
         < 0.4 => 'خفيف',

@@ -61,6 +61,13 @@ abstract final class Fmt {
     return 'بعد $days أيام';
   }
 
+  /// Hour of day as `9 ص` / `2 م`.
+  static String hour(int hour) {
+    final h = hour % 24;
+    final twelve = h % 12 == 0 ? 12 : h % 12;
+    return '$twelve ${h < 12 ? 'ص' : 'م'}';
+  }
+
   /// `02:45` countdown.
   static String countdown(int seconds) {
     final s = seconds < 0 ? 0 : seconds;

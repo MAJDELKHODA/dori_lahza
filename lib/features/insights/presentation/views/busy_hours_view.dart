@@ -1,5 +1,6 @@
 import 'package:dori_lahza/core/theme/app_dimens.dart';
 import 'package:dori_lahza/core/theme/app_palette.dart';
+import 'package:dori_lahza/core/utils/formatters.dart';
 import 'package:dori_lahza/core/widgets/layout.dart';
 import 'package:dori_lahza/core/widgets/message_view.dart';
 import 'package:dori_lahza/core/widgets/skeleton.dart';
@@ -9,8 +10,8 @@ import 'package:dori_lahza/features/insights/presentation/controllers/busy_hours
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-/// "أفضل وقت للزيارة": status now, the quietest times, a per-day hourly
-/// chart and the full weekly heatmap.
+/// "أفضل وقت للزيارة": a calm summary first (status now + suggestion), then
+/// the quietest times, the selected day's hours, and the full week on demand.
 class BusyHoursView extends GetView<BusyHoursController> {
   const BusyHoursView({super.key});
 
@@ -25,11 +26,11 @@ class BusyHoursView extends GetView<BusyHoursController> {
             child: ListView(
               padding: const EdgeInsets.all(Gap.page),
               children: const [
-                SkeletonBox(height: 90, radius: Radii.lg),
-                VSpace(Gap.lg),
-                SkeletonBox(height: 70, radius: Radii.lg),
-                VSpace(Gap.lg),
-                SkeletonBox(height: 220, radius: Radii.lg),
+                SkeletonBox(height: 120, radius: Radii.xl),
+                VSpace(Gap.xl),
+                SkeletonBox(height: 150, radius: Radii.lg),
+                VSpace(Gap.xl),
+                SkeletonBox(height: 230, radius: Radii.lg),
               ],
             ),
           ),
@@ -44,28 +45,19 @@ class BusyHoursView extends GetView<BusyHoursController> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(Gap.page, Gap.xs, Gap.page, Gap.xxl),
               children: [
-                _NowCard(now: data.now),
+                _Summary(now: data.now, suggestion: controller.suggestion(data), todayKey: controller.todayKey),
                 if (data.bestTimes.isNotEmpty) ...[
-                  const VSpace(Gap.lg),
-                  const SectionHeader(title: 'أهدأ الأوقات', padding: EdgeInsets.zero),
-                  const VSpace(Gap.xs),
-                  Wrap(
-                    spacing: Gap.xs,
-                    runSpacing: Gap.xs,
-                    children: [
-                      for (final b in data.bestTimes)
-                        Pill(label: '${b.dayLabel} · ${b.time}', tone: Tone.success, icon: Icons.spa_outlined),
-                    ],
-                  ),
+                  const VSpace(Gap.xl),
+                  const _Title('أهدأ الأوقات', 'أوقات تقل فيها الزحمة عادةً'),
+                  const VSpace(Gap.sm),
+                  _QuietList(times: data.bestTimes),
                 ],
-                const VSpace(Gap.lg),
-                const SectionHeader(title: 'الزحمة خلال اليوم', padding: EdgeInsets.zero),
-                const VSpace(Gap.xs),
+                const VSpace(Gap.xl),
+                const _Title('خلال اليوم', 'اختر يومًا لترى كيف تتغير الزحمة'),
+                const VSpace(Gap.sm),
                 _DayChart(controller: controller, data: data),
                 const VSpace(Gap.lg),
-                const SectionHeader(title: 'الأسبوع كاملًا', padding: EdgeInsets.zero),
-                const VSpace(Gap.xs),
-                _Heatmap(data: data),
+                _Week(controller: controller, data: data),
               ],
             ),
           ),
@@ -75,35 +67,97 @@ class BusyHoursView extends GetView<BusyHoursController> {
   }
 }
 
-class _NowCard extends StatelessWidget {
-  const _NowCard({required this.now});
+class _Title extends StatelessWidget {
+  const _Title(this.title, this.subtitle);
+
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: context.text.titleMedium),
+          Text(subtitle, style: context.text.bodySmall),
+        ],
+      );
+}
+
+/// Status now and the friendliest next step.
+class _Summary extends StatelessWidget {
+  const _Summary({required this.now, required this.suggestion, required this.todayKey});
 
   final BusyNow now;
+  final BestTime? suggestion;
+  final String todayKey;
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    final level = now.level;
-    final color = !now.open ? p.textMuted : (level == null ? p.strong : Color.lerp(p.success, p.danger, level)!);
-    return AppCard(
+    final s = suggestion;
+    final hint = s == null
+        ? null
+        : s.day == todayKey
+            ? 'أنسب وقت اليوم الساعة ${s.time}'
+            : 'أهدأ وقت قادم: ${s.dayLabel} الساعة ${s.time}';
+    return Container(
+      padding: const EdgeInsets.all(Gap.lg),
+      decoration: BoxDecoration(color: p.soft, borderRadius: BorderRadius.circular(Radii.xl)),
       child: Row(
         children: [
           Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(color: color.withValues(alpha: 0.14), shape: BoxShape.circle),
-            child: Icon(now.open ? Icons.sensors_rounded : Icons.nights_stay_outlined, color: color),
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(color: p.surface, shape: BoxShape.circle),
+            child: Icon(now.open ? Icons.spa_outlined : Icons.nights_stay_outlined, color: p.strong, size: 28),
           ),
           const HSpace(Gap.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('الآن', style: context.text.bodySmall),
-                Text(now.label, style: context.text.titleLarge?.copyWith(color: color)),
+                Text(now.label, style: context.text.titleLarge?.copyWith(color: p.strong)),
+                if (hint != null) ...[
+                  const VSpace(2),
+                  Text(hint, style: context.text.bodyMedium?.copyWith(color: p.textSecondary)),
+                ],
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _QuietList extends StatelessWidget {
+  const _QuietList({required this.times});
+
+  final List<BestTime> times;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return AppCard(
+      padding: const EdgeInsets.symmetric(horizontal: Gap.md, vertical: Gap.xxs),
+      child: Column(
+        children: [
+          for (var i = 0; i < times.length; i++) ...[
+            if (i > 0) const Divider(),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: Gap.sm),
+              child: Row(
+                children: [
+                  Icon(Icons.eco_outlined, size: 20, color: p.strong),
+                  const HSpace(Gap.sm),
+                  Expanded(child: Text(times[i].dayLabel, style: context.text.labelLarge)),
+                  Text(times[i].time, textDirection: TextDirection.ltr, style: context.text.titleSmall),
+                  const HSpace(Gap.sm),
+                  Pill(label: BusyHoursController.levelLabel(times[i].level), tone: Tone.brand),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -116,62 +170,96 @@ class _DayChart extends StatelessWidget {
   final BusyHoursController controller;
   final BusyHours data;
 
+  static const _maxBar = 110.0;
+
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
     return AppCard(
+      padding: const EdgeInsets.all(Gap.md),
       child: Obx(() {
         final day = controller.dayOf(data);
+        final (:quiet, :peak) = controller.extremes(day);
+        final open = day?.hours.any((h) => h.open) ?? false;
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
-              height: 36,
-              child: ListView(
+              height: 38,
+              child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                children: [
-                  for (final d in data.days) ...[
-                    ChoiceChip(
-                      label: Text(d.label),
-                      selected: d.day == day?.day,
-                      onSelected: (_) => controller.selectDay(d.day),
-                    ),
-                    const HSpace(Gap.xxs),
-                  ],
-                ],
+                itemCount: data.days.length,
+                separatorBuilder: (_, _) => const HSpace(Gap.xxs),
+                itemBuilder: (_, i) {
+                  final d = data.days[i];
+                  return ChoiceChip(
+                    label: Text(d.day == controller.todayKey ? 'اليوم' : d.label),
+                    selected: d.day == day?.day,
+                    onSelected: (_) => controller.selectDay(d.day),
+                  );
+                },
               ),
             ),
             const VSpace(Gap.lg),
-            SizedBox(
-              height: 150,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  for (final h in day?.hours ?? const <BusyHour>[])
-                    Expanded(
-                      child: Tooltip(
-                        message: h.open ? BusyHoursController.levelLabel(h.level) : 'مغلق',
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 350),
-                              curve: Curves.easeOutCubic,
-                              margin: const EdgeInsets.symmetric(horizontal: 3),
-                              height: h.open ? 10 + 110 * h.level : 6,
-                              decoration: BoxDecoration(
-                                color: h.open ? p.heat(h.level) : p.surfaceMuted,
-                                borderRadius: BorderRadius.circular(Radii.sm),
+            if (!open)
+              SizedBox(
+                height: _maxBar + 24,
+                child: Center(
+                  child: Text('مغلق في هذا اليوم', style: context.text.bodyMedium?.copyWith(color: p.textMuted)),
+                ),
+              )
+            else
+              SizedBox(
+                height: _maxBar + 24,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    for (final h in day!.hours)
+                      Expanded(
+                        child: Tooltip(
+                          message: h.open ? '${Fmt.hour(h.hour)} · ${BusyHoursController.levelLabel(h.level)}' : 'مغلق',
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              AnimatedContainer(
+                                duration: const Duration(milliseconds: 400),
+                                curve: Curves.easeOutCubic,
+                                margin: const EdgeInsets.symmetric(horizontal: 4),
+                                height: h.open ? 10 + (_maxBar - 10) * h.level : 4,
+                                decoration: BoxDecoration(
+                                  color: !h.open
+                                      ? p.surfaceMuted
+                                      : h == quiet
+                                          ? p.success.withValues(alpha: 0.55)
+                                          : p.heat(h.level),
+                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(8), bottom: Radius.circular(3)),
+                                ),
                               ),
-                            ),
-                            const VSpace(Gap.xxs),
-                            Text('${h.hour}', style: context.text.labelSmall),
-                          ],
+                              const VSpace(6),
+                              Text('${h.hour % 12 == 0 ? 12 : h.hour % 12}', style: context.text.labelSmall),
+                            ],
+                          ),
                         ),
                       ),
+                  ],
+                ),
+              ),
+            if (open && quiet != null) ...[
+              const VSpace(Gap.md),
+              Row(
+                children: [
+                  Expanded(
+                    child: _Stat(
+                      color: p.success.withValues(alpha: 0.55),
+                      label: 'الأهدأ',
+                      value: Fmt.hour(quiet.hour),
                     ),
+                  ),
+                  if (peak != null)
+                    Expanded(child: _Stat(color: p.strong, label: 'الأزحم', value: Fmt.hour(peak.hour))),
                 ],
               ),
-            ),
+            ],
           ],
         );
       }),
@@ -179,83 +267,124 @@ class _DayChart extends StatelessWidget {
   }
 }
 
-class _Heatmap extends StatelessWidget {
-  const _Heatmap({required this.data});
+class _Stat extends StatelessWidget {
+  const _Stat({required this.color, required this.label, required this.value});
 
+  final Color color;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => Row(
+        children: [
+          Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+          const HSpace(Gap.xs),
+          Text('$label: ', style: context.text.bodySmall),
+          Text(value, style: context.text.labelLarge),
+        ],
+      );
+}
+
+/// The whole week as a soft heatmap, folded by default.
+class _Week extends StatelessWidget {
+  const _Week({required this.controller, required this.data});
+
+  final BusyHoursController controller;
   final BusyHours data;
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    const cell = 26.0;
-    return AppCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Obx(() {
+      final expanded = controller.showWeek.value;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const SizedBox(width: 64),
-                    for (final h in data.hours)
-                      SizedBox(
-                        width: cell + 4,
-                        child: Text('$h', textAlign: TextAlign.center, style: context.text.labelSmall),
-                      ),
-                  ],
-                ),
-                const VSpace(Gap.xxs),
-                for (final day in data.days)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    child: Row(
+          TextButton.icon(
+            onPressed: controller.toggleWeek,
+            icon: Icon(expanded ? Icons.expand_less_rounded : Icons.calendar_view_week_rounded),
+            label: Text(expanded ? 'إخفاء الأسبوع' : 'عرض الأسبوع كاملًا'),
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutCubic,
+            child: !expanded
+                ? const SizedBox(width: double.infinity)
+                : AppCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(width: 64, child: Text(day.label, style: context.text.labelMedium)),
-                        for (final h in day.hours)
-                          Container(
-                            width: cell,
-                            height: cell,
-                            margin: const EdgeInsets.symmetric(horizontal: 2),
-                            decoration: BoxDecoration(
-                              color: h.open ? p.heat(h.level) : p.surfaceMuted,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const SizedBox(width: 64),
+                                  for (final h in data.hours)
+                                    SizedBox(
+                                      width: 30,
+                                      child: Text(
+                                        '${h % 12 == 0 ? 12 : h % 12}',
+                                        textAlign: TextAlign.center,
+                                        style: context.text.labelSmall,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              const VSpace(Gap.xxs),
+                              for (final day in data.days)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 3),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(width: 64, child: Text(day.label, style: context.text.labelMedium)),
+                                      for (final h in day.hours)
+                                        Container(
+                                          width: 24,
+                                          height: 24,
+                                          margin: const EdgeInsets.symmetric(horizontal: 3),
+                                          decoration: BoxDecoration(
+                                            color: h.open ? p.heat(h.level) : p.surfaceMuted,
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                            ],
                           ),
+                        ),
+                        const VSpace(Gap.md),
+                        Row(
+                          children: [
+                            Text('هادئ', style: context.text.labelSmall),
+                            const HSpace(Gap.xs),
+                            Expanded(
+                              child: Container(
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(Radii.pill),
+                                  // Directional so "هادئ" (start) sits on the light end in RTL.
+                                  gradient: LinearGradient(
+                                    begin: AlignmentDirectional.centerStart,
+                                    end: AlignmentDirectional.centerEnd,
+                                    colors: [p.heat(0), p.heat(0.5), p.heat(1)],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const HSpace(Gap.xs),
+                            Text('مزدحم', style: context.text.labelSmall),
+                          ],
+                        ),
                       ],
                     ),
                   ),
-              ],
-            ),
-          ),
-          const VSpace(Gap.md),
-          Row(
-            children: [
-              Text('هادئ', style: context.text.labelSmall),
-              const HSpace(Gap.xs),
-              for (final l in const [0.0, 0.25, 0.5, 0.75, 1.0])
-                Container(
-                  width: 18,
-                  height: 10,
-                  margin: const EdgeInsets.symmetric(horizontal: 1),
-                  decoration: BoxDecoration(color: p.heat(l), borderRadius: BorderRadius.circular(3)),
-                ),
-              const HSpace(Gap.xs),
-              Text('مزدحم', style: context.text.labelSmall),
-              const Spacer(),
-              Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(color: p.surfaceMuted, borderRadius: BorderRadius.circular(3)),
-              ),
-              const HSpace(Gap.xxs),
-              Text('مغلق', style: context.text.labelSmall),
-            ],
           ),
         ],
-      ),
-    );
+      );
+    });
   }
 }

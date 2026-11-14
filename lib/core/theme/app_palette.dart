@@ -81,10 +81,10 @@ class AppPalette extends ThemeExtension<AppPalette> {
   final Color star;
 
   /// Heatmap color for a busy level between 0 (quiet) and 1 (busy).
+  /// Single-hue scale in the brand's tones (calmer than green → red).
   Color heat(double level) {
     final t = level.clamp(0.0, 1.0);
-    if (t == 0) return successSoft;
-    return Color.lerp(const Color(0xFFB7EBD3), danger, t)!;
+    return Color.lerp(soft, strong, 0.12 + 0.88 * t)!;
   }
 
   static Color _ensureContrast(Color color, Color against, double ratio) {
