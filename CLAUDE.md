@@ -63,6 +63,10 @@ flutter test
 
 ## Gotchas
 
+- Never call `Get.toNamed<T>` with a non-void `T` (e.g. `<bool>`, `<Booking>`): GetX builds routes as
+  `GetPageRoute<dynamic>`, the Navigator's cast to `Route<T?>` throws, and the page silently never opens.
+  For pages that return a result use `AppNav.pushForResult<T>()` (covered by `test/navigation_test.dart`).
+
 - `Slot.startsAt` must be sent back unchanged as `starts_at`. Display times come from the API's `time`
   strings, not from converting `DateTime`s (that would shift the offset).
 - The live-queue `Poller` runs only while the queue tab is visible and the app is in the foreground.

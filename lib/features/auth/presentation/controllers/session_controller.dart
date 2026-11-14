@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dori_lahza/app/routes/app_nav.dart';
 import 'package:dori_lahza/app/routes/app_routes.dart';
 import 'package:dori_lahza/core/utils/feedback.dart';
 import 'package:dori_lahza/features/auth/domain/entities/user.dart';
@@ -50,8 +51,7 @@ class SessionController extends GetxController {
   /// Returns true when the user is (or just became) signed in.
   Future<bool> ensureSignedIn() async {
     if (isSignedIn) return true;
-    final result = await Get.toNamed<bool>(AppRoutes.login);
-    return result == true && isSignedIn;
+    return await AppNav.login() && isSignedIn;
   }
 
   Future<void> signOut() async {

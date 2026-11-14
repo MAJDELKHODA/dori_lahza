@@ -6,7 +6,20 @@ import 'package:dori_lahza/features/services/domain/entities/service.dart';
 import 'package:get/get.dart';
 
 /// Typed navigation entry points, so callers never build route arguments by hand.
+///
+/// Routes that return a result must go through [pushForResult]: GetX builds
+/// every named route as `GetPageRoute<dynamic>`, and `Get.toNamed<T>` with a
+/// non-void `T` makes the Navigator cast it to `Route<T?>`, which throws and
+/// the page silently never opens.
 abstract final class AppNav {
+  static Future<T?> pushForResult<T>(String route, {Object? arguments, bool preventDuplicates = true}) async {
+    final result = await Get.toNamed<dynamic>(route, arguments: arguments, preventDuplicates: preventDuplicates);
+    return result is T ? result : null;
+  }
+
+  /// Opens login; true once the user signed in (or registered).
+  static Future<bool> login() async => await pushForResult<bool>(AppRoutes.login) ?? false;
+
   static Future<void>? serviceDetails(int serviceId) =>
       Get.toNamed<void>(AppRoutes.serviceDetails, arguments: serviceId, preventDuplicates: false);
 
@@ -28,8 +41,9 @@ abstract final class AppNav {
         arguments: BookingDetailsArgs(bookingId, justCreated: true),
       );
 
-  static Future<bool?>? waitlistEntry(int entryId) =>
-      Get.toNamed<bool>(AppRoutes.waitlistEntry, arguments: entryId, preventDuplicates: false);
+  /// Returns true when the user left the waitlist from that page.
+  static Future<bool?> waitlistEntry(int entryId) =>
+      pushForResult<bool>(AppRoutes.waitlistEntry, arguments: entryId, preventDuplicates: false);
 
   static Future<void>? waitlist() => Get.toNamed<void>(AppRoutes.waitlist);
 
@@ -42,8 +56,8 @@ abstract final class AppNav {
       );
 
   /// Returns the updated booking when the time was changed.
-  static Future<Booking?>? reschedule(Booking booking) =>
-      Get.toNamed<Booking>(AppRoutes.reschedule, arguments: booking);
+  static Future<Booking?> reschedule(Booking booking) =>
+      pushForResult<Booking>(AppRoutes.reschedule, arguments: booking);
 
   static Future<void>? staffProfile(int staffId) =>
       Get.toNamed<void>(AppRoutes.staffProfile, arguments: staffId, preventDuplicates: false);
