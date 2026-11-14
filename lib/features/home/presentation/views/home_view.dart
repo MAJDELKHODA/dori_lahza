@@ -12,7 +12,6 @@ import 'package:dori_lahza/features/home/presentation/widgets/home_skeleton.dart
 import 'package:dori_lahza/features/place/presentation/controllers/place_controller.dart';
 import 'package:dori_lahza/features/reviews/presentation/widgets/review_widgets.dart';
 import 'package:dori_lahza/features/services/presentation/widgets/service_cards.dart';
-import 'package:dori_lahza/features/staff/presentation/widgets/staff_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -91,11 +90,6 @@ class HomeView extends GetView<HomeController> {
                       },
                     ),
                   ],
-                  const VSpace(Gap.xl),
-                  const Padding(
-                    padding: Gap.pagePadding,
-                    child: BusyHoursTeaser(onTap: AppNav.busyHours),
-                  ),
                   if (feed.popular.isNotEmpty) ...[
                     const VSpace(Gap.xl),
                     SectionHeader(
@@ -114,27 +108,6 @@ class HomeView extends GetView<HomeController> {
                           ],
                         ],
                       ),
-                    ),
-                  ],
-                  if (feed.staff.isNotEmpty) ...[
-                    const VSpace(Gap.lg),
-                    SectionHeader(title: labels.staffPlural, actionLabel: 'الكل', onAction: AppNav.team),
-                    const VSpace(Gap.xs),
-                    HorizontalStrip(
-                      height: 124,
-                      spacing: Gap.xs,
-                      itemCount: feed.staff.length,
-                      itemBuilder: (_, i) {
-                        final m = feed.staff[i];
-                        return StaffBubble(
-                          name: m.name,
-                          title: m.title,
-                          avatar: m.avatar,
-                          initials: m.initials,
-                          color: m.color,
-                          onTap: () => AppNav.staffProfile(m.id),
-                        );
-                      },
                     ),
                   ],
                   const VSpace(Gap.xl),

@@ -12,6 +12,8 @@ class Place {
     this.logo,
     this.cover,
     required this.typeName,
+    this.audience = 'all',
+    this.audienceLabel,
     required this.labels,
     this.primaryColor,
     required this.contact,
@@ -33,6 +35,10 @@ class Place {
   final String? logo;
   final String? cover;
   final String typeName;
+
+  /// `all`, or a restriction such as women only; [audienceLabel] is its wording.
+  final String audience;
+  final String? audienceLabel;
   final PlaceLabels labels;
 
   /// `theme.primary_color`, `#RRGGBB`.
@@ -46,6 +52,9 @@ class Place {
   final String currency;
   final String currencySymbol;
   final String timezone;
+
+  /// True when the place serves a specific audience only (worth showing).
+  bool get hasAudienceRestriction => audience != 'all' && (audienceLabel?.isNotEmpty ?? false);
 
   DayHours? get today {
     for (final d in openingHours) {

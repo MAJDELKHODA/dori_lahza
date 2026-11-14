@@ -281,35 +281,3 @@ class QueueTeaser extends StatelessWidget {
     );
   }
 }
-
-class BusyHoursTeaser extends StatelessWidget {
-  const BusyHoursTeaser({super.key, required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = context.palette;
-    return AppCard(
-      onTap: onTap,
-      color: p.soft,
-      borderColor: p.soft,
-      child: Row(
-        children: [
-          Icon(Icons.insights_rounded, color: p.strong, size: 30),
-          const HSpace(Gap.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('أفضل وقت للزيارة', style: context.text.titleSmall),
-                Text('اعرف الأوقات الهادئة وتجنّب الزحمة', style: context.text.bodySmall),
-              ],
-            ),
-          ),
-          Icon(Icons.chevron_right_rounded, color: p.strong),
-        ],
-      ),
-    );
-  }
-}

@@ -3,8 +3,8 @@ import 'package:dori_lahza/core/widgets/skeleton.dart';
 import 'package:dori_lahza/features/home/presentation/widgets/home_hero.dart';
 import 'package:flutter/material.dart';
 
-/// Loading layout that mirrors the home screen (cover, logo, identity,
-/// search, quick actions, banner, categories).
+/// Loading layout that mirrors the home screen: cover with the overlapping
+/// info card, search, quick actions, banner and categories.
 class HomeSkeleton extends StatelessWidget {
   const HomeSkeleton({super.key});
 
@@ -17,34 +17,24 @@ class HomeSkeleton extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           Stack(
-            clipBehavior: Clip.none,
             children: [
               SkeletonBox(height: HomeHero.coverHeight + top, radius: 0),
-              const PositionedDirectional(
-                start: Gap.page,
-                bottom: -HomeHero.logoSize / 2,
-                child: SkeletonBox.circle(size: HomeHero.logoSize + 8),
+              Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(
+                  Gap.page,
+                  top + HomeHero.coverHeight - HomeHero.cardOverlap,
+                  Gap.page,
+                  0,
+                ),
+                child: const SkeletonBox(height: 170, radius: Radii.xl),
               ),
             ],
           ),
-          const VSpace(HomeHero.logoSize / 2 + Gap.sm),
           Padding(
-            padding: Gap.pagePadding,
+            padding: const EdgeInsets.fromLTRB(Gap.page, Gap.lg, Gap.page, 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SkeletonBox(width: 70, height: 12),
-                const VSpace(6),
-                const SkeletonBox(width: 170, height: 22),
-                const VSpace(Gap.sm),
-                const Row(
-                  children: [
-                    SkeletonBox(width: 80, height: 24, radius: Radii.pill),
-                    HSpace(Gap.xs),
-                    SkeletonBox(width: 120, height: 24, radius: Radii.pill),
-                  ],
-                ),
-                const VSpace(Gap.lg),
                 const SkeletonBox(height: 50, radius: Radii.md),
                 const VSpace(Gap.lg),
                 Row(

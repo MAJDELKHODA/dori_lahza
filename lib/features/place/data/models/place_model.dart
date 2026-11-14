@@ -15,6 +15,8 @@ abstract final class PlaceModel {
       logo: asStringOrNull(json['logo']),
       cover: asStringOrNull(json['cover']),
       typeName: asString(type['name']),
+      audience: asString(json['audience'], 'all'),
+      audienceLabel: asStringOrNull(json['audience_label']),
       labels: _labels(asJson(json['labels'])),
       primaryColor: asStringOrNull(theme['primary_color']),
       contact: _contact(asJson(json['contact'])),

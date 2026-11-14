@@ -1,7 +1,6 @@
 import 'package:dori_lahza/core/theme/app_dimens.dart';
 import 'package:dori_lahza/core/theme/app_palette.dart';
 import 'package:dori_lahza/core/utils/formatters.dart';
-import 'package:dori_lahza/core/widgets/layout.dart';
 import 'package:dori_lahza/core/widgets/media.dart';
 import 'package:dori_lahza/features/auth/presentation/controllers/session_controller.dart';
 import 'package:dori_lahza/features/home/presentation/controllers/home_controller.dart';
@@ -12,12 +11,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-/// Top of home: the place cover (`cover`) edge to edge, the logo overlapping
-/// its bottom edge, then name, type, rating, open state and today's hours.
+/// Top of home: the place cover edge to edge, and a white card overlapping
+/// its bottom with the logo, name, tagline and status pills.
 class HomeHero extends StatelessWidget {
   const HomeHero({super.key, required this.controller});
 
-  static const coverHeight = 190.0;
+  /// Visible cover height below the status bar.
+  static const coverHeight = 230.0;
+
+  /// How far the info card rises into the cover.
+  static const cardOverlap = 96.0;
   static const logoSize = 84.0;
 
   final HomeController controller;
@@ -31,60 +34,24 @@ class HomeHero extends StatelessWidget {
       value: SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
       child: Obx(() {
         final place = placeController.current;
-        final user = session.user.value;
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        final signedIn = session.user.value != null;
+        return Stack(
           children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                _Cover(place: place, height: coverHeight + topInset),
-                PositionedDirectional(
-                  top: topInset + Gap.xs,
-                  start: Gap.md,
-                  end: Gap.md,
-                  child: Row(
-                    children: [
-                      _GlassButton(
-                        icon: Icons.info_outline_rounded,
-                        tooltip: 'عن المنشأة',
-                        onTap: controller.openPlaceInfo,
-                      ),
-                      const Spacer(),
-                      if (user != null) _NotificationsButton(onTap: controller.openNotifications),
-                    ],
-                  ),
-                ),
-                PositionedDirectional(
-                  start: Gap.page,
-                  bottom: -logoSize / 2,
-                  child: GestureDetector(
-                    onTap: controller.openPlaceInfo,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: context.palette.surface,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 18, offset: const Offset(0, 6)),
-                        ],
-                      ),
-                      child: AppAvatar(url: place.logo, initials: place.name.characters.first, size: logoSize),
-                    ),
-                  ),
-                ),
-                if (place.rating.hasReviews)
-                  PositionedDirectional(
-                    end: Gap.page,
-                    bottom: Gap.sm,
-                    child: _RatingBadge(average: place.rating.average, count: place.rating.count),
-                  ),
-              ],
-            ),
-            const VSpace(logoSize / 2 + Gap.sm),
+            _Cover(place: place, height: coverHeight + topInset),
+            if (signedIn)
+              PositionedDirectional(
+                top: topInset + Gap.sm,
+                end: Gap.page,
+                child: _NotificationsButton(onTap: controller.openNotifications),
+              ),
             Padding(
-              padding: Gap.pagePadding,
-              child: _Identity(place: place, greetingName: user?.name.split(' ').first),
+              padding: EdgeInsetsDirectional.fromSTEB(
+                Gap.page,
+                topInset + coverHeight - cardOverlap,
+                Gap.page,
+                0,
+              ),
+              child: _InfoCard(place: place, onTap: controller.openPlaceInfo),
             ),
           ],
         );
@@ -120,20 +87,13 @@ class _Cover extends StatelessWidget {
                 ),
               ),
             ),
-          // Darkens the top for the status bar and buttons, and the bottom
-          // edge so the overlapping logo reads cleanly.
+          // A light shade at the top keeps the status bar readable on bright covers.
           DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                stops: const [0, 0.35, 0.7, 1],
-                colors: [
-                  Colors.black.withValues(alpha: 0.45),
-                  Colors.black.withValues(alpha: 0.05),
-                  Colors.transparent,
-                  Colors.black.withValues(alpha: 0.25),
-                ],
+                end: Alignment.center,
+                colors: [Colors.black.withValues(alpha: 0.35), Colors.transparent],
               ),
             ),
           ),
@@ -143,98 +103,150 @@ class _Cover extends StatelessWidget {
   }
 }
 
-class _Identity extends StatelessWidget {
-  const _Identity({required this.place, this.greetingName});
+class _InfoCard extends StatelessWidget {
+  const _InfoCard({required this.place, required this.onTap});
 
   final Place place;
-  final String? greetingName;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    final today = place.today;
-    final hours = today != null && today.open && today.ranges.isNotEmpty ? today.ranges.join(' ، ') : null;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          greetingName == null ? 'أهلًا بك 👋' : 'أهلًا، $greetingName 👋',
-          style: context.text.bodySmall,
-        ),
-        Text(place.name, style: context.text.headlineSmall, maxLines: 1, overflow: TextOverflow.ellipsis),
-        if (place.tagline != null || place.typeName.isNotEmpty)
-          Text(
-            place.tagline ?? place.typeName,
-            style: context.text.bodyMedium?.copyWith(color: p.textSecondary),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+    final subtitle = place.tagline ?? place.description ?? (place.typeName.isEmpty ? null : place.typeName);
+    return Material(
+      color: p.surface,
+      elevation: 0,
+      borderRadius: BorderRadius.circular(Radii.xl),
+      shadowColor: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(Radii.xl),
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(Radii.xl),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 24, offset: const Offset(0, 8)),
+            ],
+            color: p.surface,
           ),
-        const VSpace(Gap.sm),
-        Wrap(
-          spacing: Gap.xs,
-          runSpacing: Gap.xs,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            Pill(
-              label: place.openNow ? 'مفتوح الآن' : 'مغلق الآن',
-              tone: place.openNow ? Tone.success : Tone.danger,
-              icon: Icons.circle,
-            ),
-            if (hours != null)
-              Pill(label: 'اليوم $hours', icon: Icons.schedule_rounded)
-            else if (today != null && !today.open)
-              const Pill(label: 'إجازة اليوم', icon: Icons.event_busy_outlined),
-          ],
+          padding: const EdgeInsets.all(Gap.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  _Logo(place: place),
+                  const HSpace(Gap.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          place.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.text.headlineSmall,
+                        ),
+                        if (subtitle != null) ...[
+                          const VSpace(Gap.xxs),
+                          Text(
+                            subtitle,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: context.text.bodyMedium?.copyWith(color: p.textSecondary),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const VSpace(Gap.md),
+              Wrap(
+                spacing: Gap.xs,
+                runSpacing: Gap.xs,
+                children: [
+                  _StatusPill(
+                    icon: Icons.circle,
+                    iconSize: 10,
+                    label: _openLabel(place),
+                    fg: place.openNow ? p.success : p.danger,
+                    bg: place.openNow ? p.successSoft : p.dangerSoft,
+                  ),
+                  if (place.rating.hasReviews)
+                    _StatusPill(
+                      icon: Icons.star_rounded,
+                      label: '${Fmt.rating(place.rating.average)} (${place.rating.count})',
+                      fg: p.warning,
+                      bg: p.warningSoft,
+                    ),
+                  if (place.hasAudienceRestriction)
+                    _StatusPill(
+                      icon: Icons.verified_user_outlined,
+                      label: place.audienceLabel!,
+                      fg: p.strong,
+                      bg: p.soft,
+                    ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ],
-    );
-  }
-}
-
-class _RatingBadge extends StatelessWidget {
-  const _RatingBadge({required this.average, required this.count});
-
-  final double average;
-  final int count;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = context.palette;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: Gap.sm, vertical: 6),
-      decoration: BoxDecoration(color: p.surface, borderRadius: BorderRadius.circular(Radii.pill)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.star_rounded, size: 18, color: p.star),
-          const HSpace(4),
-          Text(Fmt.rating(average), style: context.text.labelLarge),
-          const HSpace(4),
-          Text('($count)', style: context.text.labelSmall),
-        ],
       ),
     );
   }
+
+  /// `مفتوح الآن · حتى 17:00` / `مغلق الآن`.
+  static String _openLabel(Place place) {
+    if (!place.openNow) return 'مغلق الآن';
+    final ranges = place.today?.ranges ?? const <String>[];
+    final until = ranges.isEmpty ? null : ranges.last.split('-').last.trim();
+    return until == null || until.isEmpty ? 'مفتوح الآن' : 'مفتوح الآن · حتى $until';
+  }
 }
 
-class _GlassButton extends StatelessWidget {
-  const _GlassButton({required this.icon, required this.tooltip, required this.onTap, this.child});
+class _Logo extends StatelessWidget {
+  const _Logo({required this.place});
 
-  final IconData icon;
-  final String tooltip;
-  final VoidCallback onTap;
-
-  /// Replaces the icon (e.g. an icon with a badge).
-  final Widget? child;
+  final Place place;
 
   @override
-  Widget build(BuildContext context) => Material(
-        color: Colors.black.withValues(alpha: 0.28),
-        shape: const CircleBorder(),
-        child: IconButton(
-          tooltip: tooltip,
-          onPressed: onTap,
-          icon: child ?? Icon(icon, color: Colors.white),
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    const size = HomeHero.logoSize;
+    if (place.logo != null) {
+      return AppNetworkImage(url: place.logo, width: size, height: size, radius: Radii.lg);
+    }
+    return Container(
+      width: size,
+      height: size,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(color: p.soft, borderRadius: BorderRadius.circular(Radii.lg)),
+      child: Text(place.name.characters.first, style: context.text.headlineMedium?.copyWith(color: p.strong)),
+    );
+  }
+}
+
+class _StatusPill extends StatelessWidget {
+  const _StatusPill({required this.icon, required this.label, required this.fg, required this.bg, this.iconSize = 18});
+
+  final IconData icon;
+  final String label;
+  final Color fg;
+  final Color bg;
+  final double iconSize;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: Gap.sm, vertical: 7),
+        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(Radii.pill)),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: iconSize, color: fg),
+            const HSpace(6),
+            Text(label, style: context.text.labelLarge?.copyWith(color: fg)),
+          ],
         ),
       );
 }
@@ -246,16 +258,22 @@ class _NotificationsButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Obx(() {
+        final p = context.palette;
         final unread = Get.find<UnreadBadgeController>().unread.value;
-        return _GlassButton(
-          icon: Icons.notifications_none_rounded,
-          tooltip: 'الإشعارات',
-          onTap: onTap,
-          child: Badge.count(
-            count: unread,
-            isLabelVisible: unread > 0,
-            backgroundColor: context.palette.danger,
-            child: const Icon(Icons.notifications_none_rounded, color: Colors.white),
+        return Material(
+          color: p.surface,
+          shape: const CircleBorder(),
+          elevation: 2,
+          shadowColor: Colors.black26,
+          child: IconButton(
+            tooltip: 'الإشعارات',
+            onPressed: onTap,
+            icon: Badge.count(
+              count: unread,
+              isLabelVisible: unread > 0,
+              backgroundColor: p.danger,
+              child: Icon(Icons.notifications_none_rounded, color: p.textPrimary),
+            ),
           ),
         );
       });
