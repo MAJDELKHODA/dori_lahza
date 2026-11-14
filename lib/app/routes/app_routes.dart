@@ -10,7 +10,6 @@ abstract final class AppRoutes {
   static const placeInfo = '/place';
 
   // Browsing
-  static const services = '/services';
   static const serviceDetails = '/services/details';
   static const team = '/team';
   static const staffProfile = '/team/profile';

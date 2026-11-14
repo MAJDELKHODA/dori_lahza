@@ -1,3 +1,4 @@
+import 'package:dori_lahza/app/bindings/data_binding.dart';
 import 'package:dori_lahza/core/network/dio_client.dart';
 import 'package:dori_lahza/core/storage/token_storage.dart';
 import 'package:dori_lahza/features/auth/data/datasources/auth_remote_data_source.dart';
@@ -44,5 +45,7 @@ class InitialBinding extends Bindings {
       ),
       permanent: true,
     );
+
+    DataBinding.register();
   }
 }

@@ -1,3 +1,9 @@
-import 'package:dori_lahza/legacy/main.dart';
+import 'package:dori_lahza/app/app.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-void main() => legacyMain();
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('ar');
+  runApp(const LahzaApp());
+}
