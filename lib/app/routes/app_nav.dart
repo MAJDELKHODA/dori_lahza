@@ -21,6 +21,16 @@ abstract final class AppNav {
         arguments: BookingDetailsArgs(booking.id, initial: booking, justCreated: true),
       );
 
+  /// Same as [bookingCreated] when only the new booking's id is known.
+  static Future<void>? bookingCreatedById(int bookingId) => Get.offNamedUntil<void>(
+        AppRoutes.bookingDetails,
+        (route) => route.settings.name == AppRoutes.shell,
+        arguments: BookingDetailsArgs(bookingId, justCreated: true),
+      );
+
+  static Future<bool?>? waitlistEntry(int entryId) =>
+      Get.toNamed<bool>(AppRoutes.waitlistEntry, arguments: entryId, preventDuplicates: false);
+
   static Future<void>? bookingDetails(int bookingId, {Booking? initial}) => Get.toNamed<void>(
         AppRoutes.bookingDetails,
         arguments: BookingDetailsArgs(bookingId, initial: initial),

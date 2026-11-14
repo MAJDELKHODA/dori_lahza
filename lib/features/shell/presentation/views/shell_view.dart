@@ -2,6 +2,7 @@ import 'package:dori_lahza/features/account/presentation/views/account_view.dart
 import 'package:dori_lahza/features/bookings/presentation/views/my_bookings_view.dart';
 import 'package:dori_lahza/features/home/presentation/views/home_view.dart';
 import 'package:dori_lahza/features/place/presentation/controllers/place_controller.dart';
+import 'package:dori_lahza/features/queue/presentation/views/queue_view.dart';
 import 'package:dori_lahza/features/services/presentation/views/services_view.dart';
 import 'package:dori_lahza/features/shell/presentation/controllers/shell_controller.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +41,13 @@ class ShellView extends GetView<ShellController> {
         Icons.event_note_rounded,
         'حجوزاتي',
         MyBookingsView.new,
+      ),
+      const _TabSpec(
+        ShellTab.queue,
+        Icons.confirmation_number_outlined,
+        Icons.confirmation_number_rounded,
+        'الدور',
+        QueueView.new,
       ),
       const _TabSpec(ShellTab.account, Icons.person_outline_rounded, Icons.person_rounded, 'حسابي', AccountView.new),
     ];

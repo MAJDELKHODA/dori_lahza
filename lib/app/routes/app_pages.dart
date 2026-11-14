@@ -29,6 +29,9 @@ import 'package:dori_lahza/features/splash/presentation/views/splash_view.dart';
 import 'package:dori_lahza/features/staff/presentation/bindings/staff_bindings.dart';
 import 'package:dori_lahza/features/staff/presentation/views/staff_profile_view.dart';
 import 'package:dori_lahza/features/staff/presentation/views/team_view.dart';
+import 'package:dori_lahza/features/waitlist/presentation/bindings/waitlist_bindings.dart';
+import 'package:dori_lahza/features/waitlist/presentation/views/waitlist_entry_view.dart';
+import 'package:dori_lahza/features/waitlist/presentation/views/waitlist_view.dart';
 import 'package:get/get.dart';
 
 abstract final class AppPages {
@@ -91,6 +94,14 @@ abstract final class AppPages {
       name: AppRoutes.reschedule,
       page: () => const RescheduleView(),
       binding: BindingsBuilder(() => RescheduleBinding(Get.arguments as Booking).dependencies()),
+    ),
+
+    // Waitlist
+    GetPage(name: AppRoutes.waitlist, page: () => const WaitlistView(), binding: WaitlistBinding()),
+    GetPage(
+      name: AppRoutes.waitlistEntry,
+      page: () => WaitlistEntryView(entryId: _id),
+      binding: BindingsBuilder(() => WaitlistEntryBinding(_id).dependencies()),
     ),
   ];
 
