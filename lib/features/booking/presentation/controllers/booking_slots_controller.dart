@@ -16,6 +16,9 @@ class BookingSlotsController extends SlotPickerController {
   final Service service;
 
   @override
+  bool get showSeats => service.isGroup;
+
+  @override
   Future<void> submit() async {
     final slot = selectedSlot.value;
     final day = selectedDay.value;

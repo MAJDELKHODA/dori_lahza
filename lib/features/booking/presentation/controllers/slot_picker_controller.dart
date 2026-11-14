@@ -44,6 +44,9 @@ abstract class SlotPickerController extends GetxController {
 
   bool get canContinue => selectedSlot.value != null;
 
+  /// `seats_left` is only meaningful for group sessions.
+  bool get showSeats => false;
+
   String? get staffName {
     final id = staffId.value;
     if (id == null) return null;

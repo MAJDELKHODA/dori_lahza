@@ -142,6 +142,7 @@ class BookingConfirmView extends GetView<BookingConfirmController> {
                   ),
                   const HSpace(Gap.xs),
                   SizedBox(
+                    width: 96,
                     height: 52,
                     child: OutlinedButton(
                       onPressed: controller.isCheckingCoupon.value ? null : controller.applyCoupon,

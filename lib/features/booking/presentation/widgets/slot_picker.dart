@@ -178,6 +178,7 @@ class _SlotGrid extends StatelessWidget {
                 for (final slot in data.slots)
                   _SlotChip(
                     slot: slot,
+                    showSeats: controller.showSeats,
                     selected: controller.selectedSlot.value?.startsAt == slot.startsAt,
                     onTap: () => controller.selectSlot(slot),
                     palette: p,
@@ -189,9 +190,16 @@ class _SlotGrid extends StatelessWidget {
 }
 
 class _SlotChip extends StatelessWidget {
-  const _SlotChip({required this.slot, required this.selected, required this.onTap, required this.palette});
+  const _SlotChip({
+    required this.slot,
+    required this.showSeats,
+    required this.selected,
+    required this.onTap,
+    required this.palette,
+  });
 
   final Slot slot;
+  final bool showSeats;
   final bool selected;
   final VoidCallback onTap;
   final AppPalette palette;
@@ -219,9 +227,9 @@ class _SlotChip extends StatelessWidget {
                   textDirection: TextDirection.ltr,
                   style: context.text.titleSmall?.copyWith(color: selected ? p.onStrong : p.textPrimary),
                 ),
-                if (slot.seatsLeft != null && slot.seatsLeft! > 1)
+                if (showSeats && slot.seatsLeft != null)
                   Text(
-                    '${slot.seatsLeft} مقاعد',
+                    slot.seatsLeft == 1 ? 'مقعد واحد' : '${slot.seatsLeft} مقاعد',
                     style: context.text.labelSmall?.copyWith(color: selected ? p.onStrong : p.success),
                   ),
               ],
